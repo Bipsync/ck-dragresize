@@ -66,7 +66,9 @@
         document.addEventListener('mousemove', events.mousemove, false);
         document.addEventListener('keydown', events.keydown, false);
         document.addEventListener('mouseup', events.mouseup, false);
-        body.className += ' dragging-' + this.attr;
+        
+        addClass( body, 'dragging-' + this.attr );
+
         this.onStart && this.onStart();
       },
       update: function(e) {
@@ -94,7 +96,7 @@
         this.onComplete && this.onComplete();
       },
       release: function() {
-        body.className = body.className.replace('dragging-' + this.attr, '');
+        removeClass( body, 'dragging-' + this.attr );
         var events = this.events;
         document.removeEventListener('mousemove', events.mousemove, false);
         document.removeEventListener('keydown', events.keydown, false);
@@ -197,6 +199,7 @@
         drag.start(e);
       },
       updateHandles: function(box, left, top) {
+    
         left = left || 0;
         top = top || 0;
         var handles = this.handles;
@@ -209,6 +212,11 @@
         positionElement(handles.bm, Math.round(box.width / 2) - 3 + left, box.height - 4 + top);
         positionElement(handles.br, box.width - 4 + left, box.height - 4 + top);
       },
+      positionCheck : {
+        interval : null,
+        x : null,
+        y : null
+      },
       showHandles: function() {
         var handles = this.handles;
         this.updateHandles(this.box);
@@ -216,7 +224,23 @@
           handles[n].style.display = 'block';
           handles[n].addEventListener('mousedown', this.events.initDrag, false);
         }
-        this.el.className += ' cke-resize';
+        addClass( this.el, 'cke-resize' );
+        
+        var thisObj = this;
+        
+        this.positionCheck.interval = setInterval( function() {
+            var box = getBoundingBox( window, thisObj.el );
+            
+            if ( thisObj.positionCheck.x !== null && ( box.left != thisObj.positionCheck.x || box.top != thisObj.positionCheck.y ) ) {
+            
+                positionElement(thisObj.container, box.left, box.top);
+                
+            }
+        
+            thisObj.positionCheck.x = box.left;
+            thisObj.positionCheck.y = box.top;
+                
+        }, 50 );
       },
       hideHandles: function() {
         var handles = this.handles;
@@ -224,7 +248,10 @@
           handles[n].removeEventListener('mousedown', this.events.initDrag, false);
           handles[n].style.display = 'none';
         }
-        this.el.className = this.el.className.replace(' cke-resize', '');
+        removeClass( this.el, 'cke-resize' );
+        
+        clearInterval( this.positionCheck.interval );
+        this.positionCheck = { interval : null, x : null, y : null };
       },
       showPreview: function() {
         this.preview.style.backgroundImage = 'url("' + this.el.src + '")';
@@ -328,6 +355,10 @@
       editor.removeListener('beforeModeUnload', self);
       Resizer.hide();
     });
+    
+    editor.editable().on( 'beforecopy', function() {
+      Resizer.hide();
+    } );
 
     // Update the selection when the browser window is resized
     var resizeTimeout;
@@ -376,4 +407,37 @@
       height: rect.height
     };
   }
+  
+  function hasClass( el, className ) {
+    return el.className.match( new RegExp('(\\s|^)' + className + '(\\s|$)') );
+  }
+  
+  function addClass( el, className ) {
+
+    if ( el.hasOwnProperty( 'classList' ) ) {
+
+        el.classList.add( className );
+    
+    } else if ( !hasClass( el, className ) ) {
+    
+        el.className += " " + className;
+
+    }
+    
+  }
+  
+  function removeClass( el, className ) {
+  
+    if ( el.hasOwnProperty( 'classList' ) ) {
+    
+        el.classList.remove( className );
+    
+    } else if ( hasClass( el, className ) ) {
+    
+        var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
+        el.className = el.className.replace(reg, ' ');
+    
+    }
+  }
+  
 })();
