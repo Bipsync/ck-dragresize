@@ -32,7 +32,7 @@
         return;
       }
       //onDomReady handler
-      editor.on('contentDom', function(evt) {
+      editor.on('contentDom', function() {
         init(editor);
       });
     }
@@ -69,7 +69,7 @@
         
         addClass( body, 'dragging-' + this.attr );
 
-        this.onStart && this.onStart();
+        if ( this.onStart ) this.onStart();
       },
       update: function(e) {
         this.currentPos = {x: e.clientX, y: e.clientY};
@@ -78,7 +78,7 @@
       },
       mousemove: function(e) {
         this.update(e);
-        this.onDrag && this.onDrag();
+        if ( this.onDrag ) this.onDrag();
         if (e.which === 0) {
           //mouse button released outside window; mouseup wasn't fired (Chrome)
           this.mouseup(e);
@@ -93,7 +93,7 @@
       mouseup: function(e) {
         this.update(e);
         this.release();
-        this.onComplete && this.onComplete();
+        if ( this.onComplete ) this.onComplete();
       },
       release: function() {
         removeClass( body, 'dragging-' + this.attr );
@@ -101,7 +101,7 @@
         document.removeEventListener('mousemove', events.mousemove, false);
         document.removeEventListener('keydown', events.keydown, false);
         document.removeEventListener('mouseup', events.mouseup, false);
-        this.onRelease && this.onRelease();
+        if ( this.onRelease ) this.onRelease();
       }
     };
 
@@ -228,7 +228,7 @@
         
         var thisObj = this;
         
-        this.positionCheck.interval = setInterval( function() {
+        this.positionCheck.interval = window.setInterval( function() {
             var box = getBoundingBox( window, thisObj.el );
             
             if ( thisObj.positionCheck.x !== null && ( box.left != thisObj.positionCheck.x || box.top != thisObj.positionCheck.y ) ) {
@@ -250,7 +250,7 @@
         }
         removeClass( this.el, 'cke-resize' );
         
-        clearInterval( this.positionCheck.interval );
+        window.clearInterval( this.positionCheck.interval );
         this.positionCheck = { interval : null, x : null, y : null };
       },
       showPreview: function() {
@@ -318,7 +318,7 @@
       }
     };
     Resizer.hide = function() {
-      this.instance && this.instance.hide();
+      if ( this.instance ) this.instance.hide();
     };
 
     function selectionChange() {
@@ -364,9 +364,9 @@
     var resizeTimeout;
     editor.window.on('resize', function() {
       // Cancel any resize waiting to happen
-      clearTimeout(resizeTimeout);
+      window.clearTimeout(resizeTimeout);
       // Delay resize for 10ms
-      resizeTimeout = setTimeout(selectionChange, 50);
+      resizeTimeout = window.setTimeout(selectionChange, 50);
     });
   }
 
