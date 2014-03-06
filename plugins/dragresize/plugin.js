@@ -324,7 +324,7 @@
     function selectionChange() {
       var selection = editor.getSelection();
       // If an element is selected and that element is an IMG
-      if (selection.getType() != CKEDITOR.SELECTION_NONE && selection.getStartElement().is('img')) {
+      if (selection && (selection.getType() != CKEDITOR.SELECTION_NONE && selection.getStartElement().is('img'))) {
         // And we're not right or middle clicking on the image
         if (!window.event || !window.event.button || window.event.button === 0) {
           new Resizer(selection.getStartElement().$);
