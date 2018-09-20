@@ -7,7 +7,7 @@
  *
  */
 (function() {
-  "use strict";
+  'use strict';
 
   var PLUGIN_NAME = 'dragresize';
   var IMAGE_SNAP_TO_SIZE = 7;
@@ -30,7 +30,7 @@
         return;
       }
       //onDomReady handler
-      editor.on('contentDom', function(evt) {
+      editor.on('contentDom', function() {
         init(editor);
       });
     }
@@ -50,7 +50,7 @@
 
     function selectionChange() {
       var selection = editor.getSelection();
-      if (!selection) return;
+      if (!selection) { return; }
       // If an element is selected and that element is an IMG
       if (selection.getType() !== CKEDITOR.SELECTION_NONE && selection.getStartElement().is('img')) {
         // And we're not right or middle clicking on the image
@@ -90,7 +90,11 @@
       editor.removeListener('beforeModeUnload', self);
       resizer.hide();
     });
-
+        
+    editor.editable().on( 'beforecopy', function() { 
+      resizer.hide(); 
+    } ); 
+ 
     // Update the selection when the browser window is resized
     var resizeTimeout;
     editor.window.on('resize', function() {
@@ -137,7 +141,7 @@
     isHandle: function(el) {
       var handles = this.handles;
       for (var n in handles) {
-        if (handles[n] === el) return true;
+        if (handles[n] === el) { return true; }
       }
       return false;
     },
@@ -241,7 +245,7 @@
     },
     calculateSize: function(data) {
       var box = this.previewBox = {top: 0, left: 0, width: this.box.width, height: this.box.height};
-      if (!data) return;
+      if (!data) { return; }
       var attr = data.target.className;
       if (~attr.indexOf('r')) {
         box.width = Math.max(32, this.box.width + data.delta.x);
@@ -312,7 +316,7 @@
       this.document.addEventListener('keydown', events.keydown, false);
       this.document.addEventListener('mouseup', events.mouseup, false);
       this.document.body.classList.add('dragging-' + this.attr);
-      this.onStart && this.onStart();
+      if ( this.onStart ) { this.onStart(); }
     },
     update: function(e) {
       this.currentPos = {x: e.clientX, y: e.clientY};
@@ -321,7 +325,7 @@
     },
     mousemove: function(e) {
       this.update(e);
-      this.onDrag && this.onDrag();
+      if ( this.onDrag ) { this.onDrag(); }
       if (e.which === 0) {
         //mouse button released outside window; mouseup wasn't fired (Chrome)
         this.mouseup(e);
@@ -336,7 +340,7 @@
     mouseup: function(e) {
       this.update(e);
       this.release();
-      this.onComplete && this.onComplete();
+      if ( this.onComplete ) { this.onComplete(); }
     },
     release: function() {
       this.document.body.classList.remove('dragging-' + this.attr);
@@ -344,7 +348,7 @@
       this.document.removeEventListener('mousemove', events.mousemove, false);
       this.document.removeEventListener('keydown', events.keydown, false);
       this.document.removeEventListener('mouseup', events.mouseup, false);
-      this.onRelease && this.onRelease();
+      if ( this.onRelease ) { this.onRelease(); }
     }
   };
 
@@ -372,8 +376,8 @@
   }
 
   function resizeElement(el, width, height) {
-    el.style.width = String(width) + 'px';
-    el.style.height = String(height) + 'px';
+    el.setAttribute( 'width', String(width) ); 
+    el.setAttribute( 'height', String(height) );
   }
 
   function getBoundingBox(window, el) {
@@ -385,4 +389,5 @@
       height: rect.height
     };
   }
+
 })();
