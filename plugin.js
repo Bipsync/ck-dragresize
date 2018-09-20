@@ -248,7 +248,7 @@
       for (var n in handles) {
         handles[n].style.display = 'none';
       }
-      this.el.classList.remove('ckimgrsz');
+      if (this.el) { this.el.classList.remove('ckimgrsz'); }
         
       clearInterval( this.positionCheck.interval );
       this.positionCheck = { interval : null, x : null, y : null };
