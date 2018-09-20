@@ -214,18 +214,44 @@
       positionElement(handles.bm, Math.round(box.width / 2) - 3 + left, box.height - 4 + top);
       positionElement(handles.br, box.width - 4 + left, box.height - 4 + top);
     },
+    positionCheck : {
+      interval : null,
+      x : null,
+      y : null
+    },
     showHandles: function() {
       var handles = this.handles;
       this.updateHandles(this.box);
       for (var n in handles) {
         handles[n].style.display = 'block';
       }
+      this.el.classList.add('ckimgrsz');
+      
+      var thisObj = this;
+      
+      this.positionCheck.interval = setInterval( function() {
+          var box = getBoundingBox( window, thisObj.el );
+          
+          if ( thisObj.positionCheck.x !== null && ( box.left != thisObj.positionCheck.x || box.top != thisObj.positionCheck.y ) ) {
+          
+              positionElement(thisObj.container, box.left, box.top);
+              
+          }
+      
+          thisObj.positionCheck.x = box.left;
+          thisObj.positionCheck.y = box.top;
+              
+      }, 50 );
     },
     hideHandles: function() {
       var handles = this.handles;
       for (var n in handles) {
         handles[n].style.display = 'none';
       }
+      this.el.classList.remove('cke-resize');
+        
+      clearInterval( this.positionCheck.interval );
+      this.positionCheck = { interval : null, x : null, y : null };
     },
     showPreview: function() {
       this.preview.style.backgroundImage = 'url("' + this.el.src + '")';
