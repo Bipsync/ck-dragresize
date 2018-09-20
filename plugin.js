@@ -376,8 +376,8 @@
   }
 
   function resizeElement(el, width, height) {
-    el.setAttribute( 'width', String(width) ); 
-    el.setAttribute( 'height', String(height) );
+    el.style.width = String(width) + 'px';
+    el.style.height = String(height) + 'px';
   }
 
   function getBoundingBox(window, el) {
